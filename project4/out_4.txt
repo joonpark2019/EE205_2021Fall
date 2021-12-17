@@ -1,0 +1,1 @@
+Error: negative cost cycle is found

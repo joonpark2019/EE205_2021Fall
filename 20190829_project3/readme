@@ -1,0 +1,66 @@
+Student ID: 20190829
+Name: 박준
+
+1.
+A hashtable using separate chaining was utilized. 
+A hashtable was chosen because the lookup task is very rapid (O(1) time).
+Thus, by adding every distinct word to a hash table, it can be quickly checked if a newly parsed word was already encountered before.
+A struct Word was defined to be a data item which contains a word field and a frequency field as well as nextWord, a pointer to another word so that a linked list of Words can  be formed at a hash index.
+By defining a new struct Word and using a frequency field, the frequency can be quickly updated if a word was found again and can be used for sorting the words later.
+A struct WordTable was defined to contain a hash table called lookupTable and an array
+named storeTable to store pointers to all distinct words in the hash table.
+A function lookupWord() is defined to take a parsed string and add a new struct Word to both the lookupTable and the storeTable if it is not found in the lookupTable. If a word is found to have a match in the lookupTable, the frequency field is incremented.
+
+The overall approach in the main function is to first define a WordTable (named as WordCounter in the program main function) then parse words (str) from stdin using the provided token.c code and use lookupWord(WordCounter, str) function after each word.
+ This checks for the word in the lookupTable; searching for a word in the lookupTable involves evaludating the  hash function and traversing the linked list at the hash index. 
+As mentioned, searching is much quicker for a hash table because evaluation of the hash index is in O(1) time.
+
+Finally, qsort is applied to the storeTable using a comparator function which
+compares struct Word elements based on their frequency fields. This sorts
+words in descending order based on their frequency.
+Using the built-in qsort using the frequency fields makes sorting much faster.
+
+2.
+The following were used to find th words and their corresponding frequencies
+in the given sample files.
+./token < Crime-and-Punishment.txt | sort | uniq -c | sort -k 1 -n -r | more 
+./token < iliad.txt | sort | uniq -c | sort -k 1 -n -r | more
+
+The program's result for the top 10 most frequent words were found:
+./count 10 < Crime-and-Punishment.txt
+./count 10 < iliad.txt
+
+The results for the top 10 words and their frequencies were compared.
+Some simple custom-made Ttst files were also used for testing and are included as a reference.
+
+Results for Crime-and-Punishment:
+   6975 the
+   5952 and
+   5122 to
+   4224 a
+   4210 I
+   3576 of
+   3465 he
+   3325 you
+   2927 that
+   2923 in
+Results for Iliad:
+   13393 the
+   4998 and
+   4996 of
+   3909 to
+   3250 d
+   3079 his
+   2815 in
+   2250 The
+   2108 And
+   2038 with
+
+3.
+3 separate trials were conducted on each text file.
+
+Crime-and-Punishment.txt:
+0.014724 seconds, 0.014658 seconds, 0.015048 seconds
+
+iliad.txt:
+0.016090 seconds, 0.016988 seconds, 0.016855 seconds

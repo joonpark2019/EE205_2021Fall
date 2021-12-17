@@ -1,0 +1,125 @@
+Student ID: 20190829
+Name: 박준
+
+1.
+For both implementations, I chose not to use an adjacency list or an adjacency matrix 
+but rather just a 2d array (graph[m][3], m:number of edges) storing all of the edges of the graph given. 
+graph[m][0] is the source vertex, graph[m][1] is the destination vertex,
+ and graph[m][2] is the edge weight for each edge.
+In the context of Bellman-Ford, traversing through all the edge of the graph 
+to determine the neighbors of a source vertex in this fashion is much more effective 
+than traversing through an adjacency matrix or adjacency list. 
+Firstly, it is likely more memory efficient than an adjacency list for most graphs (since m <= n^2).
+Traversing through m edges takes O(m) time while traversing through an adjacency matrix 
+for a directed graph would take O(n^2) time since the algorithm must go through each column (source vertices) 
+and check if there is an edge with a making the algorithm.
+Thus, bellman ford can take place in O(mn) time while it would take O(n^3) time for an adjacency matrix. 
+With an adjacency list, it is not possible to determine which vertices are neighbors from incoming edges, 
+which is necessary for bellman ford’s algorithm.
+In both cases, a predecessor array B was used for path reconstruction of the shortest path. 
+
+Brief description of Bellman Ford implementation:
+
+The array A stores the shortest path lengths 
+(A[v]: shortest path length s->v).
+The array B is an array where B[v] stores the immediate predecessor to v in the shortest s->v path.
+Therefore, the shortest s->v path can recursively be printed by starting from v and following the predecessors until s is reached.
+(ie B[B[B[....]]] until s is reached and then printing value from s)
+
+The space optimization was implemented by not using an nxn array
+but rather a 1D array of length n. For each iteration of the
+algorithm, A[v] is updated instead of caching A[i][v] at the ith iteration.
+A nested for loop is used to implement the recurrence relation.
+The outer for loop loops through i=1 to n for all possible number of edges
+and the inner for loop loops over all egdes to check edge weights from incoming
+neighbor nodes w to vertex v for A[v].
+
+If A[w] + l_wv is shorter than A[v] for a neighbor w of v
+at the ith iteration, then A[v] is updated to A[w] + l_wv.
+Also, w is assigned to B[v].
+Else, A[v] stays the same and B[v] stays the same.
+
+The outer for loop can be stopped early if there are no more updates made to A[v] for all v.
+This is checked with the flag 'stable', which is initialized to TRUE at the start
+of each outer loop iteration. If the stable flag remains TRUE after the inner for loop,
+it means no more updates took place so the outer for loop can be stopped.
+The outer for loop is run for n iterations; theoretically, there should be no
+updates made after n-1 iterations if the graph has no negative cost cycles.
+If the flag has been changed after the nth iteration, it means that there must be a negative cost cycle. Thus, the flag value is used to check for a negative
+cost cycle.
+
+The shortest path (s->v) can be printed by calling a recursive function which calls itself on the predecessor of v (B[v]) and then printing on return. The base case condition for recursion is that the function's node argument becomes equal to the source s.
+
+
+Brief description of Floyd Warshall implementation:
+
+The 2d array A stores the shortest path length between a pair of nodes.
+(A[i][j] is the shortest path length of path i->j).
+The 2d array B stores the predecessors of the shortest path between a pair of nodes.
+(B[i][j] stores the immediate predecessor node to j in path i->j )
+
+A similar space optimization is done as the bellman ford case:
+Instead of using a 3d array A[n+1][n+1][n+1], a 2d array is used.
+A[k][v][w] would be the shortest path length from v to w for the kth iteration;
+instead, A[v][w] is updates at each iteration if a shorter length is found.
+
+The main algorithm uses three nested for loops.
+The outermost loop loops through all values of k (1 to n), which is the node value 
+up to which a path may use as internal nodes (if k=4, a path may use 1,2,3,4 as internal nodes). 
+The inner nested for loop goes through all combinations of (v,w) for 
+a source node v and destination node w in a v->w path.
+If A[v][k] + A[k][w], then A[v][w] is updates to A[v][k] + A[k][w]. 
+Also, B[v][w] is set to B[k][w].
+Otherwise, A[v][w] and B[v][w] remain unchanged.
+
+The shortest path is printed recursively as in the bellman ford case, except
+it is called for all pairs of source and destination vertices.
+
+If A[v][v] is negative for any vertex v, there is a negative cost cycle. 
+Therefore, A[v][v] is checked for all vertices to check if the graph has
+a negative cost cycle.
+
+2. 
+Timing results (based on input graphs provided):
+
+time ./bf < input_1.txt > /dev/null:
+real    0m0.016s
+user    0m0.016s
+sys     0m0.000s
+
+time ./bf < input_2.txt > /dev/null:
+real    0m8.146s
+user    0m8.141s
+sys     0m0.004s
+
+time ./bf < input_3.txt > /dev/null:
+real    0m9.434s
+user    0m9.417s
+sys     0m0.016s
+
+time ./bf < input_4.txt > /dev/null:
+real    0m2.280s
+user    0m2.280s
+sys     0m0.000s
+
+
+time ./fw < input_1.txt > /dev/null:
+real    0m0.009s
+user    0m0.009s
+sys     0m0.000s
+
+
+time ./fw < input_2.txt > /dev/null:
+real    0m4.856s
+user    0m4.836s
+sys     0m0.020s
+
+time ./fw < input_3.txt > /dev/null:
+real    0m4.845s
+user    0m4.837s
+sys     0m0.008s
+
+time ./fw < input_4.txt > /dev/null:
+real    0m4.589s
+user    0m4.588s
+sys     0m0.000s

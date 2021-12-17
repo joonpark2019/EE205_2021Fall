@@ -1,0 +1,86 @@
+1. 
+Both quickA and quickB uses an approach where indices n1 and n2 are given as inputs
+to quicksort(), which sorts the array between those indices 
+(including elements at n1 and n2).
+
+Description of quickA.c:
+quickA.c uses a function ChoosePivot() to choose between four pivot-choices.
+ChoosePivot() returns the index of the element to be used as the pivot and receives
+a type of pivot strategy as an input.
+If the input int type == 1, ChoosePivot() returns the index of the first element 
+in the array/subarray.
+If type == 2, the last element is returned. If type==3, an element at a random index
+between n1 and n2 is returned. If type==4, the median-of-three approach is used.
+
+ChoosePivot() is called in the function partition(), which partitions the array from n1 to n2
+according to the partition scheme discussed during lecture.
+quicksort() calls partition() to determine the pivot location, and recursively 
+calls itself on the 2 subarrays of elements lower than and greater than the pivot.
+
+The number of comparisons are tracked using a pointer long* comparisons. 
+quicksort() accesses the pointer adds the lengths of both of the subarrays minus one
+ to the value at the pointer.
+As well, in ChoosePivot(), the value at comparisons is incremented during the median-of-three
+approach, where at most 3 comparisons are made between elements at n1, middle, and n2.
+For each comparison, *comparisons+=1 is performed.
+
+Description of quickB.c:
+The quicksort() function in quickB.c utilizes the median-of-three approach.
+Like quickA, the quicksort() function calls the partition() function, which chooses a pivot
+between n1 and n2 and partitions the array into two subarrays.
+The partition() function calls MedThree(), which compares the elements at n1, middle, and n2 
+and swaps them until the median of the three is placed in the middle index.
+The partition() function then uses the element at the middle index as the pivot.
+The full description of the optimizations used are described in 3.
+
+2. 
+qsort() is used to compare the performance of my custom function quicksort() 
+against the quicksort implemented in C. 
+
+qsort() takes an array pointer, the length of the array, the memory size
+of each array element, and a pointer to comparison function.
+According the the qsort man page:
+"The comparison function must return an integer less than, equal to,  or  greater
+than  zero  if  the  first  argument is considered to be respectively less than,
+equal to, or greater than the second."
+Therefore, I wrote a function compare() to take two const void pointers (A and B), 
+cast them to type int and return *A - *B. In this way, 
+if *A is less than *B, an integer less than zero is returned. 
+Alternatively, if *A equals *B, zero is returned; 
+if *A is greater than *B, an integer greater than zero is returned.
+
+To prepare the inputs to qsort, strings read from stdin are turned into integers by atoi 
+and stored in integer array arr until EOF. At the same time, a counter len of type long,
+ is incremented from zero so that it equals the length of the array.
+The pointer arr and (size_t)len are passed as inputs into qsort() for the array pointer and 
+size of the array.
+
+3. 
+There are three main optimizations used in quicksort() which allow for better performance over qsort().
+
+Firstly, the median-of-three method selects a pivot which ensures an even splitting of the array.
+If the first or last element is chosen, very large subarrays can result when the array is somewhat sorted.
+The median-of-three chooses a pivot which ensures that the subarrays are split more evenly.
+This method also has an advantage over random pivots as it reduces the number of comparisons.
+When partitioning, the first and the last elements can be excluded from comparisons.
+This is because the pivot is the median of the elements at the first, middle, and last indices -
+therefore, the first and last elements are guaranteed to be smaller than and greater than the 
+pivot. Therefore, by excluding these 2 elements, fewer comparisons are made in total during partition. 
+
+Secondly, quicksort() uses a different partition scheme known as hoare's partition scheme.
+The pivot is first swapped with the element at n1+1.
+This scheme uses 2 counters l, h initialized to n1+1+1 and n2-1 respectively 
+In each iteration, l is incremented with a while loop until arr[l] is larger than or equal to the pivot.
+At the same time, h is decremented with a while until arr[h] is smaller than the pivot.
+Following these 2 while loops, in the same iteration, swap the elements at l and h.
+This maintains the loop invariant that all elements at indices less than l are lower than the pivot
+ and all elements at indices  greater than h are greater than the pivot.
+Due to the use of the while loops, the partition scheme passes through the array more quickly
+as each iteration goes through more elements.
+
+Lastly, InsertionSort() is used in the base case of quicksort() when the number of
+elements left to sort is less than 20. 
+InsertionSort() is faster for sorting elements in place for a small array because it
+does not require partitioning or recursive calls.
+
+
